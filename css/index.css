@@ -1,0 +1,32 @@
+
+#nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #f5f5f5;
+}
+
+#nav-bar img.logo {
+    height: 90px;
+    width: 120px;
+}
+
+#nav-bar input[type="text"] {
+    padding: 0.3rem;
+    font-size: 1rem;
+}
+
+#nav-bar input[type="submit"] {
+    padding: 0.3rem 0.6rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+main {
+    margin: auto;
+    width: 50%;
+    border: 3px solid #22222;
+    text-align: center;
+    padding: 10px;
+}

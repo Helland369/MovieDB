@@ -1,39 +1,23 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const app = express();
 const path = require('path');
+const app = express();
 const port = 3000;
 
 // .env
 dotenv.config();
 
 // load directorys
-app.use(express.static('img'));
-app.use(express.static('views'));
-
-// TMDB api
-const url = 'https://api.themoviedb.org/3/configuration';
-const options =
-{
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${process.env.TMDB}`
-  }
-};
-
-fetch(url, options)
-  .then(res => res.json())
-  .then(json => console.log(json))
-  .catch(err => console.error(err));
-
+app.use('/css', express.static(path.join(__dirname, 'css')));
+app.use(express.static(path.join(__dirname, 'img')));
 
 // route
 app.get('/', (req, res) =>
 {
-  res.send('index.html');
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+// trending
 app.get('/tmdb/trending', async (req, res) => {
   const url = 'https://api.themoviedb.org/3/trending/all/day?language=en-US';
 
@@ -54,19 +38,19 @@ app.get('/tmdb/trending', async (req, res) => {
     // loop out the items
     const htmlItems = data.results.map(item =>
     {
-      const title = item.title || item.name || 'NO TITLE';
-      return `<li>${title}</li>`;
+      const title = item.title || item.name || 'NO TITLE!';
+      const originalTitle = item.original_name || item.original_title || 'NO ORIGINAL TITLE!';
+      const description = item.overview || 'NO DESCRIPTION!';
+      const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'NO POSTRER!';
+      
+      return `<h2>${title}</h2> <h3>${originalTitle}</h3> <p>${description}</p> <img src="${poster}">`;
     }).join('');
 
     res.send(`
-      <html>
-        <body>
-          <h1>Trending now!</h1>
-          <ul>
-            <li>${htmlItems}</li>
-          <ul>
-        </body
-      </html>
+      <h1>Trending now!</h1>
+        <div>
+          <div>${htmlItems}</div>
+        </div>
     `);
     
   } catch (err) {
