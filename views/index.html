@@ -7,13 +7,14 @@
   <script src="https://unpkg.com/htmx.org@2.0.4"
     integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
     crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/index.css">
   <title>MovieDb</title>
 </head>
 
-  <body>
+  <body
     <header>
       <nav id="nav-bar">
-        <img id="logo" src="image.jpg" width=120 height=90>
+        <img id="logo" class="logo" src="image.jpg">
         <div id="menu">menu?</div>
         <label for="search"></label>
         <input type="text" name="search" id="name" placeholder="Search">
@@ -23,12 +24,11 @@
     </header>
 
     <main>
-      <div>Movies</div>
+      <div hx-get="http://localhost:3000/tmdb/trending" hx-trigger="load"></div>
     </main>
 
     <footer>
       <p>something</p>
     </footer>
   </body>
-
 </html>
