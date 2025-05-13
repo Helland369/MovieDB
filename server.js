@@ -59,6 +59,49 @@ app.get('/tmdb/trending', async (req, res) => {
   }
 });
 
+app.get('/tmdb/search', async (req, res) => {
+
+  const searchQuery = req.query.query;
+
+  if (!searchQuery)
+  {
+    return res.send(`<div id="results"></div>`);
+  }
+  
+  const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(searchQuery)}&include_adult=false&language=en-US&page=1`;
+
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${process.env.TMDB}`
+    }
+  };
+
+  try
+  {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+    
+    const data = await response.json();
+
+    const html = data.results.map(movie => `
+      <div class="movie">
+        <strong>${movie.title}</strong> (${movie.release_date?.slice(0, 4) || 'N/A'})<br>
+        <em>${movie.overview?.slice(0, 150) || 'NO DESCRIPTION AVAILABLE'}...</em>
+        <hr>
+      </div>
+   `).join('');
+
+    res.send(html);
+  }
+  catch (err)
+  {
+    console.log(err);
+    res.status(500).send('Error fetching trending');
+  }
+});
+
 // server
 app.listen(port, () => {
    console.log(`Server is running at http://localhost:${port}`);

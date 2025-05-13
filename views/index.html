@@ -16,15 +16,25 @@
       <nav id="nav-bar">
         <img id="logo" class="logo" src="image.jpg">
         <div id="menu">menu?</div>
-        <label for="search"></label>
-        <input type="text" name="search" id="name" placeholder="Search">
-        <label for="search-btn"></label>
-        <input type="submit" name="search-btn" id="search-btn">
+        <input
+          type="text"
+          name="query"
+          id="name"
+          placeholder="Search"
+          hx-get="/tmdb/search"
+          hx-trigger="keyup delay:200ms"
+          hx-target="#results"
+          hx-indicator="#loading"
+          autocomplete="off"/>
       </nav>
     </header>
 
     <main>
-      <div hx-get="http://localhost:3000/tmdb/trending" hx-trigger="load"></div>
+      <div id="loading" class="htmx-indicator" style="display:none">loading...</div>
+
+      <div id="results"></div>
+
+      <div hx-get="/tmdb/trending" hx-trigger="load"></div>
     </main>
 
     <footer>
