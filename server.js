@@ -62,13 +62,14 @@ app.get('/tmdb/trending', async (req, res) => {
 app.get('/tmdb/search', async (req, res) => {
 
   const searchQuery = req.query.query;
-
+  let page = parseInt(req.query.page) || 1;
+  
   if (!searchQuery)
   {
     return res.send(`<div id="results"></div>`);
   }
-  
-  const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(searchQuery)}&include_adult=false&language=en-US&page=1`;
+
+  const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(searchQuery)}&include_adult=false&language=en-US&page=${page}`;
 
   const options = {
     method: 'GET',
@@ -85,13 +86,13 @@ app.get('/tmdb/search', async (req, res) => {
     
     const data = await response.json();
 
-    const html = data.results.map(movie => `
+    const html = data.results.length > 0 ? data.results.map(movie => `
       <div class="movie">
         <strong>${movie.title}</strong> (${movie.release_date?.slice(0, 4) || 'N/A'})<br>
         <em>${movie.overview?.slice(0, 150) || 'NO DESCRIPTION AVAILABLE'}...</em>
         <hr>
       </div>
-   `).join('');
+   `).join('') : `<div></div>`;
 
     res.send(html);
   }

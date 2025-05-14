@@ -11,7 +11,7 @@
   <title>MovieDb</title>
 </head>
 
-  <body
+  <body>
     <header>
       <nav id="nav-bar">
         <img id="logo" class="logo" src="image.jpg">
@@ -22,8 +22,9 @@
           id="name"
           placeholder="Search"
           hx-get="/tmdb/search"
-          hx-trigger="keyup delay:200ms"
+          hx-trigger="keyup changed delay:300ms"
           hx-target="#results"
+          hx-swap="innerHTML"
           hx-indicator="#loading"
           autocomplete="off"/>
       </nav>
@@ -34,11 +35,32 @@
 
       <div id="results"></div>
 
+      <input type="hidden" id="next-page" value="2">
+
+      <div
+        id="load-more"
+        hx-get="/tmdb/search"
+        hx-trigger="revealed"
+        hx-swap="beforeend"
+        hx-target="#results"
+        hx-vals='js:{"query": document.getElementById("name").value, "page": document.getElementById("next-page").value}'></div>
+
       <div hx-get="/tmdb/trending" hx-trigger="load"></div>
+
     </main>
 
     <footer>
       <p>something</p>
     </footer>
   </body>
+
+<script>
+  document.body.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.elt.id === 'load-more') {
+      let nextPage = document.getElementById('next-page');
+      nextPage.value = parseInt(nextPage.value) + 1;
+    }
+  });
+</script>
+
 </html>
