@@ -31,36 +31,38 @@
     </header>
 
     <main>
-      <div id="loading" class="htmx-indicator" style="display:none">loading...</div>
 
       <div id="results"></div>
 
-      <input type="hidden" id="next-page" value="2">
+      <div id="trending-container">
+        <div
+          id="trending-all"
+          hx-get="/tmdb/trending"
+          hx-target="#container"
+          hx-trigger="click, load"
+        >All Trending</div>
 
-      <div
-        id="load-more"
-        hx-get="/tmdb/search"
-        hx-trigger="revealed"
-        hx-swap="beforeend"
-        hx-target="#results"
-        hx-vals='js:{"query": document.getElementById("name").value, "page": document.getElementById("next-page").value}'></div>
+        <div
+          id="trending-tv"
+          hx-get="/tmdb/trending_tv_show"
+          hx-target="#container"
+          hx-trigger="click"
+        >Trending tv shows</div>
 
-      <div hx-get="/tmdb/trending" hx-trigger="load"></div>
+        <div
+          id="trending-movie"
+          hx-get="/tmdb/trending_movie"
+          hx-target="#container"
+          hx-trigger="click"
+        >Trending movies</div>
+      </div>
+
+      <div id="container"></div>
 
     </main>
 
     <footer>
-      <p>something</p>
+      <p>Congratulations you reached the bottm ^^</p>
     </footer>
   </body>
-
-<script>
-  document.body.addEventListener('htmx:afterRequest', function(evt) {
-    if (evt.detail.elt.id === 'load-more') {
-      let nextPage = document.getElementById('next-page');
-      nextPage.value = parseInt(nextPage.value) + 1;
-    }
-  });
-</script>
-
 </html>
