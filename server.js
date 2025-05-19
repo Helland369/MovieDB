@@ -11,6 +11,9 @@ dotenv.config();
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use(express.static(path.join(__dirname, 'img')));
 
+// global variables
+const redirect = 'http://localhost:3000/tmdb/auth/callback'
+
 // route
 app.get('/', (req, res) =>
 {
@@ -105,7 +108,7 @@ app.get('/tmdb/trending_tv_show', async (req, res) => {
     res.send(html);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error fetching trending');
+    res.status(500).send('Error fetching trending tv shows');
   }
 });
 
@@ -151,7 +154,7 @@ app.get('/tmdb/trending_movie', async (req, res) => {
     res.send(html);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error fetching trending');
+    res.status(500).send('Error fetching trending movies');
   }
 });
 
@@ -201,7 +204,38 @@ app.get('/tmdb/search', async (req, res) => {
   catch (err)
   {
     console.log(err);
-    res.status(500).send('Error fetching trending');
+    res.status(500).send('Error fetching search');
+  }
+});
+
+// authentication
+app.get('/tmdb/auth', async (req, res) => {
+
+  const url = 'https://api.themoviedb.org/3/authentication/token/new';
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${process.env.TMDB}`
+    }
+  };
+
+  try
+  {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+    
+    const data = await response.json();
+
+    const token = data.request_token;
+
+    const tmdbRedirectUri = `https://www.themoviedb.org/authenticate/${token}?redirect_to=${encodeURIComponent(redirect)}`
+    res.redirect(tmdbRedirectUri);
+  }
+  catch (err)
+  {
+    console.log(err);
+    res.status(500).send('Error fetching auth');
   }
 });
 
