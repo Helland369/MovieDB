@@ -235,7 +235,44 @@ app.get('/tmdb/auth', async (req, res) => {
   catch (err)
   {
     console.log(err);
-    res.status(500).send('Error fetching auth');
+    res.status(500).send('Error fetching auth token');
+  }
+});
+
+app.get('/tmdb/auth/callback', async (req, res) => {
+
+  const { request_token } = req.query;
+
+  if (!request_token)
+  {
+    return res.status(400).send('Missing request_token');
+  }
+
+  const url = 'https://api.themoviedb.org/3/authentication/session/new';
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${process.env.TMDB}`
+    },
+    body: JSON.stringify({ request_token })
+};
+
+  try
+  {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+
+    const data = await response.json();
+    console.log('Session id: ', data.session_id);
+
+    res.send(`Session created: ${data.session_id}`);
+  }
+  catch (err)
+  {
+    console.log(err);
+    res.status(500).send('Error conpleating TMDB auth');
   }
 });
 
