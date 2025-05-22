@@ -4,6 +4,10 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
+// cookies
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 // .env
 dotenv.config();
 
@@ -267,7 +271,13 @@ app.get('/tmdb/auth/callback', async (req, res) => {
     const data = await response.json();
     console.log('Session id: ', data.session_id);
 
-    res.send(`Session created: ${data.session_id}`);
+    res.cookie('tmdb_session_id', data.session_id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 1000, // 1 week
+    });
+
+    res.redirect('/');
   }
   catch (err)
   {
