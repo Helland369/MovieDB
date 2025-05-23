@@ -104,7 +104,7 @@ app.get('/tmdb/trending', async (req, res) => {
           <img src="${poster}">
           <p>Rating: ${voteAvg}</p>
 
-          <form action="/tmdb/add_rating" method="post">
+          <form hx-post="/tmdb/add_rating" hx-target="this" hx-swap="outerHtML">
             <input type="hidden" name="movieId" value="${id}">
             <label>Rate this movie (0.5 - 10):</label>
             <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
@@ -208,8 +208,23 @@ app.get('/tmdb/trending_movie', async (req, res) => {
       const originalTitle = item.original_name || item.original_title || 'NO ORIGINAL TITLE!';
       const description = item.overview || 'NO DESCRIPTION!';
       const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'NO POSTRER!';
+      const id = item.id;
       
-      return `<h2>${title}</h2> <h3>${originalTitle}</h3> <p>${description}</p> <img src="${poster}">`;
+      return `
+        <div>
+          <h2>${title}</h2>
+          <h3>${originalTitle}</h3>
+          <p>${description}</p>
+          <img src="${poster}">
+
+          <form hx-post="/tmdb/add_rating" hx-target="this" hx-swap="outerHtML">
+            <input type="hidden" name="movieId" value="${id}">
+            <label>Rate this movie (0.5 - 10):</label>
+            <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
+            <button type="submit">Submit rating</button>
+          </form>
+        <div>
+      `;
     }).join('');
 
     let html =`
