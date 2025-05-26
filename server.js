@@ -30,8 +30,8 @@ app.get('/', (req, res) =>
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// add rating
-app.post('/tmdb/add_rating', async (req, res) => {
+// add movie rating
+app.post('/tmdb/add_rating_movie', async (req, res) => {
 
   const { movieId, rating } = req.body;
   
@@ -64,12 +64,43 @@ app.post('/tmdb/add_rating', async (req, res) => {
 
 });
 
+// add tv-show rating
+app.post('/tmdb/add_rating_tv', async (req, res) => {
+  const { movieId, rating } = req.body;
+
+  const url = `https://api.themoviedb.org/3/tv/${movieId}/rating`;
+
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json;charset=utf-8',
+      Authorization: `Bearer ${process.env.TMDB}`
+    },
+    body: JSON.stringify({value: parseFloat(rating)}),
+};
+
+  try
+  {
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+
+    res.send(`<p>Thanks for rating this movie: ${movieId}! TMDB says: ${data.status_message}</p>`);
+  }
+  catch (err)
+  {
+    console.log('TMDB post error:', err);
+    res.status(500).send('Something went wrong');
+  }
+})
+
 // trending all
 app.get('/tmdb/trending', async (req, res) => {
   let page = parseInt(req.query.page) || 1;
 
   const url = `https://api.themoviedb.org/3/trending/all/day?language=en-US&page=${page}`;
-  const addRating = `https://api.themoviedb.org/3/movie/movie_id/rating`;
   
   const options = {
     method: 'GET',
@@ -104,7 +135,7 @@ app.get('/tmdb/trending', async (req, res) => {
           <img src="${poster}">
           <p>Rating: ${voteAvg}</p>
 
-          <form hx-post="/tmdb/add_rating" hx-target="this" hx-swap="outerHtML">
+          <form hx-post="/tmdb/add_rating_movie" hx-target="this" hx-swap="outerHtML">
             <input type="hidden" name="movieId" value="${id}">
             <label>Rate this movie (0.5 - 10):</label>
             <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
@@ -159,8 +190,21 @@ app.get('/tmdb/trending_tv_show', async (req, res) => {
       const originalTitle = item.original_name || item.original_title || 'NO ORIGINAL TITLE!';
       const description = item.overview || 'NO DESCRIPTION!';
       const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'NO POSTRER!';
-      
-      return `<h2>${title}</h2> <h3>${originalTitle}</h3> <p>${description}</p> <img src="${poster}">`;
+      const id = item.id;
+
+      return `
+        <h2>${title}</h2>
+        <h3>${originalTitle}</h3>
+        <p>${description}</p>
+        <img src="${poster}">
+
+        <form hx-post="/tmdb/add_rating_tv" hx-target="this" hx-swap="outerHtML">
+          <input type="hidden" name="movieId" value="${id}">
+          <label>Rate this movie (0.5 - 10):</label>
+          <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
+          <button type="submit">Submit rating</button>
+        </form>
+     `;
     }).join('');
 
     let html =`
@@ -217,7 +261,7 @@ app.get('/tmdb/trending_movie', async (req, res) => {
           <p>${description}</p>
           <img src="${poster}">
 
-          <form hx-post="/tmdb/add_rating" hx-target="this" hx-swap="outerHtML">
+          <form hx-post="/tmdb/add_rating_movie" hx-target="this" hx-swap="outerHtML">
             <input type="hidden" name="movieId" value="${id}">
             <label>Rate this movie (0.5 - 10):</label>
             <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
