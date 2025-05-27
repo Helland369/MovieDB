@@ -135,12 +135,23 @@ app.get('/tmdb/trending', async (req, res) => {
           <img src="${poster}">
           <p>Rating: ${voteAvg}</p>
 
-          <form hx-post="/tmdb/add_rating_movie" hx-target="this" hx-swap="outerHtML">
+          <form hx-post="/tmdb/add_rating_movie" hx-target="this" hx-swap="outerHTML">
             <input type="hidden" name="movieId" value="${id}">
             <label>Rate this movie (0.5 - 10):</label>
             <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
             <button type="submit">Submit rating</button>
           </form>
+
+          <form
+            hx-post="/tmdb/add_favorite"
+            hx-target="#favorite-message-${id}"
+            hx-swap="innerHTML">
+
+            <input type="hidden" name="movieId" value="${id}">
+            <button type="submit">Add to favorites</button>
+          </form>
+
+          <div id="favorite-message-${id}"></div>
         </div>
       `;
     }).join('');
@@ -409,6 +420,70 @@ app.get('/tmdb/auth/callback', async (req, res) => {
   {
     console.log(err);
     res.status(500).send('Error conpleating TMDB auth');
+  }
+});
+
+app.post('/tmdb/add_favorite', async (req, res) => {
+
+  const { movieId } = req.body;
+  
+  const tmdb_session_id = req.cookies.tmdb_session_id;
+
+  if (!tmdb_session_id)
+  {
+    return res.status(400).send('You must be logged in to favorite a movie');
+  }
+
+  if (!movieId)
+  {
+    return res.status(400).send('Missing movieId');
+  }
+  
+  try
+  {
+    // fetch account id
+    const getAccountId = async (sessionId) => {
+      const response = await fetch(`https://api.themoviedb.org/3/account?session_id=${sessionId}`, {
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${process.env.TMDB}`
+        }
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(`Failed to get account id: ${data.status_message}`);
+      return data.id;
+    };
+
+    const accountId = await getAccountId(tmdb_session_id)
+    
+    const url = `https://api.themoviedb.org/3/account/${accountId}/favorite?session_id=${tmdb_session_id}`;
+    const options = {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        Authorization: `Bearer ${process.env.TMDB}`
+      },
+      body: JSON.stringify({
+        media_type: 'movie',
+        media_id: parseInt(movieId),
+        favorite: true,
+      }),
+    };
+
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+    
+    res.send(`<p>Thanks for favoriting this movie: ${movieId}! TMDB says: ${data.status_message}</p>`);
+    
+  }
+  catch (err)
+  {
+    console.log('TMDB post error:', err);
+    res.status(500).send('Something went wrong');
   }
 });
 
