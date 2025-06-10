@@ -487,6 +487,64 @@ app.post('/tmdb/add_favorite', async (req, res) => {
   }
 });
 
+app.get('/tmdb/top_rated_movies', async (req, res) => {
+
+  let page = parseInt(req.query.page) || 1;
+  
+  const url = `https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${page}`;
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${process.env.TMDB}`
+    }
+  };
+
+  try
+  {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+
+    const data = await response.json();
+
+    const htmlItems = data.results.map(item =>
+    {
+      const title = item.title || item.name || 'NO TITLE!';
+      const originalTitle = item.original_title || item.original_name || 'NO ORIGINAL TITLE!';
+      const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'NO POSTER!';
+      const description = item.overview || 'NO DESCRIPTION!';
+      const avgRating = item.vote_average || 'NO AVERAGE RATING!';
+      const totalRatings = item.vote_count || 'NO TOTAL RATINGS!';
+
+      return `
+        <div>
+          <h2>${title}</h2>
+          <h3>${originalTitle}</h3>
+          <p>${description}</p>
+          <img src="${poster}">
+          <p>Average rating: ${avgRating} Total rating: ${totalRatings}</p>
+        </div>
+      `;
+    }).join('');
+
+    let html = `
+      <div>
+        <div>${htmlItems}</div>
+      </div>
+    `;
+
+    html += `
+      <div hx-get="/tmdb/top_rated_movies?page=${page + 1}" hx-trigger="revealed" hx-swap="afterend"></div>
+    `;
+    res.send(html);
+  }
+  catch (err)
+  {
+    console.error(err);
+    res.status(500).send('Error fetching trending movies');
+  }
+});
+
 // server
 app.listen(port, () => {
    console.log(`Server is running at http://localhost:${port}`);
