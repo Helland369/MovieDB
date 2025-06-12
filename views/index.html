@@ -35,6 +35,12 @@
           onclick="window.location.href='/tmdb/auth'"
         >Login</div>
 
+        <div
+          id="favorite-movies"
+          hx-get="/tmdb/view_favorites"
+          hx-target="#container"
+          hx-trigger="click"
+        >Favorite movies</div>
       </nav>
     </header>
 
