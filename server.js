@@ -75,7 +75,7 @@ app.post("/tmdb/add_rating_movie", async (req, res) => {
     );
   } catch (err) {
     console.log("TMDB post error:", err);
-    res.status(500).send("Something went wrong");
+    res.status(500).send("Error adding movie rating");
   }
 });
 
@@ -106,7 +106,7 @@ app.post("/tmdb/add_rating_tv", async (req, res) => {
     );
   } catch (err) {
     console.log("TMDB post error:", err);
-    res.status(500).send("Something went wrong");
+    res.status(500).send("Error adding tv-show rating");
   }
 });
 
@@ -427,7 +427,7 @@ app.get("/tmdb/auth/callback", async (req, res) => {
     res.redirect("/");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error conpleating TMDB auth");
+    res.status(500).send("Error compleating TMDB auth");
   }
 });
 
@@ -472,7 +472,7 @@ app.post("/tmdb/add_favorite", async (req, res) => {
     );
   } catch (err) {
     console.log("TMDB post error:", err);
-    res.status(500).send("Something went wrong");
+    res.status(500).send("Error adding favorites");
   }
 });
 
@@ -534,7 +534,7 @@ app.get("/tmdb/view_favorite_movies", async (req, res) => {
     res.send(html);
   } catch (err) {
     console.log("TMDB post error:", err);
-    res.status(500).send("Something went wrong");
+    res.status(500).send("Error fetching favorite movies");
   }
 });
 
@@ -595,7 +595,7 @@ app.get("/tmdb/view_favorite_tv_shows", async (req, res) => {
     res.send(html);
   } catch (err) {
     console.log("TMDB post error:", err);
-    res.status(500).send("Something went wrong");
+    res.status(500).send("Error fetcing favorite th-shows");
   }
 });
 
@@ -654,7 +654,7 @@ app.get("/tmdb/top_rated_movies", async (req, res) => {
     res.send(html);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error fetching trending movies");
+    res.status(500).send("Error fetching top rated movies");
   }
 });
 
