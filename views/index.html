@@ -29,18 +29,26 @@
           autocomplete="off"/>
 
         <div
+          id="favorite-movies"
+          hx-get="/tmdb/view_favorite_movies"
+          hx-target="#container"
+          hx-trigger="click"
+        >Favorite movies</div>
+
+        <div
+          id="favorite-movies"
+          hx-get="/tmdb/view_favorite_tv_shows"
+          hx-target="#container"
+          hx-trigger="click"
+        >Favorite tv-shows</div>
+
+        <div
           id="login"
           href="/tmdb/auth"
           style="cursor:pointer;"
           onclick="window.location.href='/tmdb/auth'"
         >Login</div>
 
-        <div
-          id="favorite-movies"
-          hx-get="/tmdb/view_favorites"
-          hx-target="#container"
-          hx-trigger="click"
-        >Favorite movies</div>
       </nav>
     </header>
 
