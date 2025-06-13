@@ -157,17 +157,6 @@ app.get("/tmdb/trending", async (req, res) => {
             <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
             <button type="submit">Submit rating</button>
           </form>
-
-          <form
-            hx-post="/tmdb/add_favorite"
-            hx-target="#favorite-message-${id}"
-            hx-swap="innerHTML">
-
-            <input type="hidden" name="movieId" value="${id}">
-            <button type="submit">Add to favorites</button>
-          </form>
-
-          <div id="favorite-message-${id}"></div>
         </div>
       `;
       })
@@ -232,6 +221,18 @@ app.get("/tmdb/trending_tv_show", async (req, res) => {
           <input type="number" name="rating" min="0.5" max="10" step="0.5" required>
           <button type="submit">Submit rating</button>
         </form>
+
+        <form
+          hx-post="/tmdb/add_favorite"
+          hx-target="#favorite-message-${id}"
+          hx-swap="innerHTML">
+
+          <input type="hidden" name="movieId" value="${id}">
+          <input type="hidden" name="mediaType" value="tv">
+          <button type="submit">Add to favorites</button>
+        </form>
+
+        <div id="favorite-message-${id}"></div>
      `;
       })
       .join("");
@@ -297,6 +298,18 @@ app.get("/tmdb/trending_movie", async (req, res) => {
             <button type="submit">Submit rating</button>
           </form>
         <div>
+
+        <form
+          hx-post="/tmdb/add_favorite"
+          hx-target="#favorite-message-${id}"
+          hx-swap="innerHTML">
+
+          <input type="hidden" name="movieId" value="${id}">
+          <input type="hidden" name="mediaType" value="movie">
+          <button type="submit">Add to favorites</button>
+        </form>
+
+        <div id="favorite-message-${id}"></div>
       `;
       })
       .join("");
@@ -432,7 +445,7 @@ app.get("/tmdb/auth/callback", async (req, res) => {
 });
 
 app.post("/tmdb/add_favorite", async (req, res) => {
-  const { movieId } = req.body;
+  const { movieId, mediaType } = req.body;
 
   const tmdb_session_id = req.cookies.tmdb_session_id;
 
@@ -440,8 +453,8 @@ app.post("/tmdb/add_favorite", async (req, res) => {
     return res.status(400).send("You must be logged in to favorite a movie");
   }
 
-  if (!movieId) {
-    return res.status(400).send("Missing movieId");
+  if (!["movie", "tv"].includes(mediaType)) {
+    return res.status(400).send("Invalid mediaType, must be movie or tv");
   }
 
   try {
@@ -456,7 +469,7 @@ app.post("/tmdb/add_favorite", async (req, res) => {
         Authorization: `Bearer ${process.env.TMDB}`,
       },
       body: JSON.stringify({
-        media_type: "movie",
+        media_type: mediaType,
         media_id: parseInt(movieId),
         favorite: true,
       }),
