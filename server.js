@@ -476,8 +476,8 @@ app.post("/tmdb/add_favorite", async (req, res) => {
   }
 });
 
-// TODO add favorite movies and tv-shows.
-app.get("/tmdb/view_favorites", async (req, res) => {
+// favorite movies
+app.get("/tmdb/view_favorite_movies", async (req, res) => {
   let page = parseInt(req.query.page) || 1;
 
   const tmdb_session_id = req.cookies.tmdb_session_id;
@@ -490,6 +490,67 @@ app.get("/tmdb/view_favorites", async (req, res) => {
     const accountId = await getAccountId(tmdb_session_id);
 
     const url = `https://api.themoviedb.org/3/account/${accountId}/favorite/movies?language=en-US${page}&sort_by=created_at.asc&session_id=${tmdb_session_id}`;
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${process.env.TMDB}`,
+      },
+    };
+
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+
+    const data = await response.json();
+
+    const htmlItems = data.results
+      .map((item) => {
+        const title = item.title || item.name || "NO TITLE!";
+        const originalTitle = item.original_title || "NO ORIGINAL TITLE!";
+        const description = item.overview || "NO DESCRIPTION";
+        const poster = item.poster_path
+          ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+          : "NO POSTRER!";
+
+        return `
+        <div>
+          <h2>${title}</h2>
+          <h3>${originalTitle}</h3>
+          <img src="${poster}">
+          <p>${description}</p>
+        </div>
+      `;
+      })
+      .join("");
+
+    let html = `
+      <div>
+        <div>${htmlItems}</div>
+      </div>
+    `;
+
+    html += `<div hx-get="/tmdb/view_favorites?page=${page + 1}" hx-trigger="revealed" hx-swap="afterend"></div>`;
+
+    res.send(html);
+  } catch (err) {
+    console.log("TMDB post error:", err);
+    res.status(500).send("Something went wrong");
+  }
+});
+
+app.get("/tmdb/view_favorite_tv_shows", async (req, res) => {
+  let page = parseInt(req.query.page) || 1;
+
+  const tmdb_session_id = req.cookies.tmdb_session_id;
+
+  if (!tmdb_session_id) {
+    return res.status(400).send("You must be logged in to favorite a movie");
+  }
+
+  try {
+    const accountId = await getAccountId(tmdb_session_id);
+
+    const url = `https://api.themoviedb.org/3/account/${accountId}/favorite/tv?language=en-US${page}&sort_by=created_at.asc&session_id=${tmdb_session_id}`;
     const options = {
       method: "GET",
       headers: {
