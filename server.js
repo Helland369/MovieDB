@@ -369,6 +369,18 @@ app.get("/tmdb/details/:media_type/:id", async (req, res) => {
         <p><strong>First aired:</strong> ${airDate}</p>
         <p><strong>Rating: </strong> ${avgRating}</p>
       </div>
+
+      <form
+        hx-post="/tmdb/add_favorite"
+        hx-target="#favorite-message-${id}"
+        hx-swap="innerHTML">
+
+        <input type="hidden" name="movieId" value="${id}">
+        <input type="hidden" name="mediaType" value="tv">
+        <button type="submit">Add to favorites</button>
+      </form>
+
+      <div id="favorite-message-${id}"></div>
     `;
 
     res.send(html);
@@ -432,6 +444,7 @@ app.get("/tmdb/search", async (req, res) => {
                 <em>${description}</em>
                 <hr>
                 </a>
+
               `;
             })
             .join("")
