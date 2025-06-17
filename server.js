@@ -6,6 +6,7 @@ const port = 3000;
 
 // cookies
 const cookieParser = require("cookie-parser");
+const { url } = require("inspector");
 app.use(cookieParser());
 
 // forms
@@ -329,6 +330,54 @@ app.get("/tmdb/trending_movie", async (req, res) => {
   }
 });
 
+// details
+app.get("/tmdb/details/:media_type/:id", async (req, res) => {
+  const { media_type, id } = req.params;
+
+  const url = `https://api.themoviedb.org/3/${media_type}/${id}?language=en-US`;
+
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${process.env.TMDB}`,
+    },
+  };
+
+  try {
+    const response = await fetch(url, options);
+
+    if (!response) throw new Error(`TMDB detail error: ${response.status}`);
+
+    const item = await response.json();
+
+    const title = item.title || item.name || "NO TITLE";
+    const originalName = item.original_name || "NO ORIGINAL NAME";
+    const description = item.overview || "NO DESCRIPTION";
+    const airDate = item.first_air_date || "NO FIRST AIR DATE";
+    const avgRating = item.vote_averag || "NO AVERAG RATING";
+    const posterPath = item.poster_path
+      ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+      : "";
+
+    const html = `
+      <div>
+        <h1>${title}</h1>
+        <h3>${originalName}</h3>
+        <img src="${posterPath}">
+        <p>${description}</p>
+        <p><strong>First aired:</strong> ${airDate}</p>
+        <p><strong>Rating: </strong> ${avgRating}</p>
+      </div>
+    `;
+
+    res.send(html);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching details");
+  }
+});
+
 // search
 app.get("/tmdb/search", async (req, res) => {
   const searchQuery = req.query.query;
@@ -338,7 +387,7 @@ app.get("/tmdb/search", async (req, res) => {
     return res.send(`<div id="results"></div>`);
   }
 
-  const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(searchQuery)}&include_adult=false&language=en-US&page=${page}`;
+  const url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&include_adult=false&language=en-US&page=${page}`;
 
   const options = {
     method: "GET",
@@ -358,12 +407,32 @@ app.get("/tmdb/search", async (req, res) => {
       data.results.length > 0
         ? data.results
             .map((item) => {
-              const title = item.title || "NO TITLE";
-              const releseDate = item.release_date?.slice(0, 4) || "N/A";
+              const title = item.title || item.name || "NO TITLE";
+              const releaseDate = item.release_date?.slice(0, 4) || "N/A";
               const description =
                 item.overview?.slice(0, 150) || "NO DESCRIPTION AVAILABLE";
+              const mediaType = item.media_type;
+              const id = item.id;
 
-              return `<strong>${title}</strong> ${releseDate}<rb><em>${description}</em><hr>`;
+              return `
+                <a
+                  href="#"
+                  hx-get="/tmdb/details/${mediaType}/${id}"
+                  hx-target="#container"
+                  hx-swap="innerHTML"
+                  hx-on::before-request="
+                    const input = document.getElementById('name');
+                    const results = document.getElementById('results');
+                    if (input) input.value = '';
+                    if (results) results.innerHTML = '';
+                  "
+                  style="text-decoration: none; color: inherit;"
+                >
+                <strong>${title}</strong> ${releaseDate}<br>
+                <em>${description}</em>
+                <hr>
+                </a>
+              `;
             })
             .join("")
         : `<div></div>`;
@@ -429,7 +498,6 @@ app.get("/tmdb/auth/callback", async (req, res) => {
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
 
     const data = await response.json();
-    console.log("Session id: ", data.session_id);
 
     res.cookie("tmdb_session_id", data.session_id, {
       httpOnly: true,
