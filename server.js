@@ -6,7 +6,7 @@ const port = 3000;
 
 // cookies
 const cookieParser = require("cookie-parser");
-const { url } = require("inspector");
+//const { url } = require("inspector");
 app.use(cookieParser());
 
 // forms
@@ -458,6 +458,68 @@ app.get("/tmdb/search", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error fetching search");
+  }
+});
+
+// filter search
+app.get("/tmdb/filter_search/:media_type", async (req, res) => {
+  const { media_type } = req.params;
+  const url = `https://api.themoviedb.org/3/discover/${media_type}?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc`;
+
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${process.env.TMDB}`,
+    },
+  };
+
+  try {
+    const response = await fetch(url, options);
+
+    if (!response) throw new Error(`TMDB detail error: ${response.status}`);
+
+    const data = await response.json();
+
+    const htmlItems = data.results
+      .map((item) => {
+        const id = item.id;
+        const title = item.title || item.name || "NO TITLE!";
+        const originalTitle = item.original_title || "NO ORIGINAL TITLE!";
+        const description = item.overview || "DO DESCRIPTION!";
+        const releaseDate =
+          item.release_date || item.first_air_date || "NO RELEASE DATE!";
+        const averageRating = item.vote_average || "NO AVRAGE RATING!";
+        const totRatings = item.vote_count || "NO TOTAL RATING!";
+        const poster = item.poster_path
+          ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+          : "NO POSTRER!";
+
+        return `
+          <div>
+            <h1>${title}</h2>
+            <h3>${originalTitle}</h3>
+            <img src="${poster}">
+            <p>${description}</p>
+            <p>Release date: ${releaseDate}</p>
+            <p>Average rating: ${averageRating} | Total ratings: ${totRatings}</p>
+          <div>
+        `;
+      })
+      .join("");
+
+    let html = `
+      <div>
+        <div>${htmlItems}</div>
+      </div>
+    `;
+
+    html += `<div hx-get="/tmdb/filter_search/${media_type}?page=${page + 1}" hx-trigger="revealed" hx-swap="afterend"></div>`;
+
+    res.send(html);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching filter search");
   }
 });
 
