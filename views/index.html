@@ -1,101 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://unpkg.com/htmx.org@2.0.4"
-    integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
-    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="/css/index.css">
   <title>MovieDb</title>
 </head>
+<body>
+  <header>
+    <nav id="nav-bar">
+      <img id="logo" class="logo" src="/image.jpg" alt="MovieDb Logo">
+      <div id="menu">Menu</div>
+      <input
+        type="text"
+        name="query"
+        id="name"
+        placeholder="Search"
+        hx-get="/tmdb/search"
+        hx-trigger="keyup changed delay:300ms"
+        hx-target="#results"
+        hx-swap="innerHTML"
+        hx-indicator="#loading"
+        autocomplete="off"
+      />
+      <div
+        id="favorite-movies"
+        hx-get="/tmdb/view_favorite_movies"
+        hx-target="#container"
+        hx-trigger="click"
+      >Favorite Movies</div>
+      <div
+        id="favorite-tv-shows"
+        hx-get="/tmdb/view_favorite_tv_shows"
+        hx-target="#container"
+        hx-trigger="click"
+      >Favorite TV Shows</div>
+      <div
+        id="login"
+        style="cursor:pointer;"
+        onclick="window.location.href='/tmdb/auth'"
+      >Login</div>
+    </nav>
+  </header>
 
-  <body>
-    <header>
-      <nav id="nav-bar">
-        <img id="logo" class="logo" src="image.jpg">
-        <div id="menu">menu?</div>
-        <input
-          type="text"
-          name="query"
-          id="name"
-          placeholder="Search"
-          hx-get="/tmdb/search"
-          hx-trigger="keyup changed delay:300ms"
-          hx-target="#results"
-          hx-swap="innerHTML"
-          hx-indicator="#loading"
-          autocomplete="off"/>
+  <main>
+    <div id="trending-container">
+      <div
+        id="trending-all"
+        hx-get="/tmdb/trending"
+        hx-target="#container"
+        hx-trigger="click, load"
+      >All Trending</div>
+      <div
+        id="trending-tv"
+        hx-get="/tmdb/trending_tv_show"
+        hx-target="#container"
+        hx-trigger="click"
+      >Trending TV Shows</div>
+      <div
+        id="trending-movie"
+        hx-get="/tmdb/trending_movie"
+        hx-target="#container"
+        hx-trigger="click"
+      >Trending Movies</div>
+      <div
+        id="top-rated-movies"
+        hx-get="/tmdb/top_rated_movies"
+        hx-target="#container"
+        hx-trigger="click"
+      >Top Rated</div>
+    </div>
 
-        <div
-          id="favorite-movies"
-          hx-get="/tmdb/view_favorite_movies"
-          hx-target="#container"
-          hx-trigger="click"
-        >Favorite movies</div>
+    <div id="filter-section">
+      <div
+        class="filter-button"
+        hx-get="/filter_form"
+        hx-target="#filter-container"
+        hx-swap="innerHTML"
+      >Filter Results</div>
+      <div id="filter-container"></div>
+    </div>
 
-        <div
-          id="favorite-movies"
-          hx-get="/tmdb/view_favorite_tv_shows"
-          hx-target="#container"
-          hx-trigger="click"
-        >Favorite tv-shows</div>
+    <div id="results"></div>
+    <div id="container"></div>
+    <div id="loading" class="htmx-indicator" style="display: none;">Loading...</div>
+  </main>
 
-        <div
-          id="login"
-          href="/tmdb/auth"
-          style="cursor:pointer;"
-          onclick="window.location.href='/tmdb/auth'"
-        >Login</div>
+  <footer>
+    <p>Congratulations you reached the bottom ^^</p>
+  </footer>
 
-      </nav>
-    </header>
-
-    <main>
-
-      <div id="results"></div>
-
-      <div id="loading" class="htmx-indicator" style="display: none;">
-        Loading...
-      </div>
-
-      <div id="trending-container">
-        <div
-          id="trending-all"
-          hx-get="/tmdb/trending"
-          hx-target="#container"
-          hx-trigger="click, load"
-        >All Trending</div>
-
-        <div
-          id="trending-tv"
-          hx-get="/tmdb/trending_tv_show"
-          hx-target="#container"
-          hx-trigger="click"
-        >Trending tv shows</div>
-
-        <div
-          id="trending-movie"
-          hx-get="/tmdb/trending_movie"
-          hx-target="#container"
-          hx-trigger="click"
-        >Trending movies</div>
-
-        <div
-          id="/top-rated-movies"
-          hx-get="tmdb/top_rated_movies"
-          hx-target="#container"
-          hx-trigger="click"
-        >Top rated</div>
-      </div>
-
-      <div id="container"></div>
-
-    </main>
-
-    <footer>
-      <p>Congratulations you reached the bottm ^^</p>
-    </footer>
-  </body>
+  <script>
+    document.addEventListener('htmx:afterSwap', (event) => {
+      if (event.detail.target.id === 'filter-container') {
+        const form = document.querySelector('.filter-form');
+        if (form) form.classList.toggle('active');
+      }
+    });
+  </script>
+</body>
 </html>
