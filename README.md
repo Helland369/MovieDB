@@ -11,7 +11,7 @@
 # About
 This is a simple IMDB clone made as a school project, using the moviedb api, Express.js and HTMX.
 
-In this application you can see; All trending movies/tv-shows, top rated movies/tv-shows, add to favoritte and rate a movie or tv-show.
+In this application you can see; All trending movies/tv-shows, top rated movies/tv-shows, add to favorite and rate a movie or tv-show.
 
 # Installation
 
@@ -49,7 +49,7 @@ In the ==Moviedb== directory make a .env file
 touch .env
 ```
 
-Make a .env variables
+Create a .env variables
 
 ```
 TMDB=YOUR_THE_MOVIE_DATABASE_BEARER_TOKEN
@@ -62,4 +62,77 @@ npm run dev
 ```
 
 # Documentation
+
+## /tmdb/add_rating_movie
+
+Posts the movie rating to tmdb.
+
+## /tmdb/add_rating_tv
+
+Posts the tv-show rating to tmdb.
+
+## /tmdb/trending
+g
+
+Gets all the trending
+ tv-shows and movies from tmdb.
+
+## /tmdb/trending
+g_tv_show
+
+Gets the trending
+g tv-shows from tmdb.
+
+## /tmdb/trending
+g_movie
+
+Gets the trending
+g movies from tmdb.
+
+## /tmdb/details/:media_type/:id
+
+Gets the detailed information for tv-shows and movies. Information like description, release date, etc.
+
+## /tmdb/search
+
+Gets movies and tv-shows that matches what you search for.
+
+## /tmdb/filter_search
+
+Gets the filtered search results.
+
+## /filter_form
+
+Contains the filter form for; /tmdb/filter_search.
+
+## /genres
+
+Gets the genres for the filter search
+
+## /tmdb/auth
+
+Gets the authentication token for login.
+
+## /tmdb/auth/callback
+
+Gets the callback from tmdb for authentication.
+
+## /tmdb/add_favorite
+
+Posts the movie or tv-show that you want to add to favorites.
+
+## /tmdb/view_favorite_movies
+
+Gets the favorited movies from the logged in
+ account.
+
+## /tmdb/view_favorite_tv_shows
+
+Gets the favorited tv-shows from the logged in
+ account
+
+## /tmdb/top_rated_movies
+
+Gets the top rated movies from tmdb.
+
 
