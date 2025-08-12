@@ -43,7 +43,7 @@ npm install
 
 ## Setup .env file
 
-In the ==Moviedb== directory make a .env file
+In the <mark>Moviedb<mark> directory make a .env file
 
 ```
 touch .env
@@ -72,7 +72,6 @@ Posts the movie rating to tmdb.
 Posts the tv-show rating to tmdb.
 
 ## /tmdb/trending
-g
 
 Gets all the trending
  tv-shows and movies from tmdb.
