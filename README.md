@@ -43,7 +43,7 @@ npm install
 
 ## Setup .env file
 
-In the <mark>Moviedb<mark> directory make a .env file
+In the <mark>Moviedb</mark> directory make a .env file
 
 ```
 touch .env
