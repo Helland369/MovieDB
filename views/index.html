@@ -89,5 +89,13 @@
     <footer>
       <p>Congratulations you reached the bottom ^^</p>
     </footer>
+    <script>
+      document.addEventListener('htmx:afterSwap', (event) => {
+        if (event.detail.target.id === 'filter-container') {
+          const form = document.querySelector('.filter-form');
+          if (form) form.classList.toggle('active');
+        }
+      });
+    </script>
   </body>
 </html>
