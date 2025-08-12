@@ -7,97 +7,87 @@
   <link rel="stylesheet" href="/css/index.css">
   <title>MovieDb</title>
 </head>
-<body>
-  <header>
-    <nav id="nav-bar">
-      <img id="logo" class="logo" src="/image.jpg" alt="MovieDb Logo">
-      <div id="menu">Menu</div>
-      <input
-        type="text"
-        name="query"
-        id="name"
-        placeholder="Search"
-        hx-get="/tmdb/search"
-        hx-trigger="keyup changed delay:300ms"
-        hx-target="#results"
-        hx-swap="innerHTML"
-        hx-indicator="#loading"
-        autocomplete="off"
-      />
-      <div
-        id="favorite-movies"
-        hx-get="/tmdb/view_favorite_movies"
-        hx-target="#container"
-        hx-trigger="click"
-      >Favorite Movies</div>
-      <div
-        id="favorite-tv-shows"
-        hx-get="/tmdb/view_favorite_tv_shows"
-        hx-target="#container"
-        hx-trigger="click"
-      >Favorite TV Shows</div>
-      <div
-        id="login"
-        style="cursor:pointer;"
-        onclick="window.location.href='/tmdb/auth'"
-      >Login</div>
-    </nav>
-  </header>
+  <body>
+    <header>
+      <nav id="nav-bar">
+        <img id="logo" class="logo" src="/image.jpg" alt="MovieDb Logo">
+        <input
+          type="text"
+          name="query"
+          id="name"
+          placeholder="Search"
+          hx-get="/tmdb/search"
+          hx-trigger="keyup changed delay:300ms"
+          hx-target="#results"
+          hx-swap="innerHTML"
+          hx-indicator="#loading"
+          autocomplete="off"
+        />
+        <div
+          id="favorite-movies"
+          hx-get="/tmdb/view_favorite_movies"
+          hx-target="#container"
+          hx-trigger="click"
+        >Favorite Movies</div>
+        <div
+          id="favorite-tv-shows"
+          hx-get="/tmdb/view_favorite_tv_shows"
+          hx-target="#container"
+          hx-trigger="click"
+        >Favorite TV Shows</div>
+        <div
+          id="login"
+          style="cursor:pointer;"
+          onclick="window.location.href='/tmdb/auth'"
+        >Login</div>
+      </nav>
+    </header>
 
-  <main>
-    <div id="trending-container">
-      <div
-        id="trending-all"
-        hx-get="/tmdb/trending"
-        hx-target="#container"
-        hx-trigger="click, load"
-      >All Trending</div>
-      <div
-        id="trending-tv"
-        hx-get="/tmdb/trending_tv_show"
-        hx-target="#container"
-        hx-trigger="click"
-      >Trending TV Shows</div>
-      <div
-        id="trending-movie"
-        hx-get="/tmdb/trending_movie"
-        hx-target="#container"
-        hx-trigger="click"
-      >Trending Movies</div>
-      <div
-        id="top-rated-movies"
-        hx-get="/tmdb/top_rated_movies"
-        hx-target="#container"
-        hx-trigger="click"
-      >Top Rated</div>
-    </div>
+    <main>
+      <div id="trending-container">
+        <div
+          id="trending-all"
+          hx-get="/tmdb/trending"
+          hx-target="#container"
+          hx-trigger="click, load"
+        >All Trending</div>
+        <div
+          id="trending-tv"
+          hx-get="/tmdb/trending_tv_show"
+          hx-target="#container"
+          hx-trigger="click"
+        >Trending TV Shows</div>
+        <div
+          id="trending-movie"
+          hx-get="/tmdb/trending_movie"
+          hx-target="#container"
+          hx-trigger="click"
+        >Trending Movies</div>
+        <div
+          id="top-rated-movies"
+          hx-get="/tmdb/top_rated_movies"
+          hx-target="#container"
+          hx-trigger="click"
+        >Top Rated</div>
+      </div>
 
-    <div id="filter-section">
-      <div
-        class="filter-button"
-        hx-get="/filter_form"
-        hx-target="#filter-container"
-        hx-swap="innerHTML"
-      >Filter Results</div>
-      <div id="filter-container"></div>
-    </div>
+      <div id="filter-section">
+        <div
+          class="filter-button"
+          hx-get="/filter_form"
+          hx-target="#filter-container"
+          hx-swap="innerHTML"
+        >Filter Results</div>
+        <div id="filter-container"></div>
+      </div>
 
-    <div id="results"></div>
-    <div id="container"></div>
-    <div id="loading" class="htmx-indicator" style="display: none;">Loading...</div>
-  </main>
+      <div id="results"></div>
+      <div id="container"></div>
+      <div id="loading" class="htmx-indicator" style="display: none;">Loading...</div>
+    </main>
 
-  <footer>
-    <p>Congratulations you reached the bottom ^^</p>
-  </footer>
-
-  <script>
-    document.addEventListener('htmx:afterSwap', (event) => {
-      if (event.detail.target.id === 'filter-container') {
-        const form = document.querySelector('.filter-form');
-        if (form) form.classList.toggle('active');
-      }
-    });
-  </script>
-</body>
+    <footer>
+      <p>Congratulations you reached the bottom ^^</p>
+    </footer>
+  </body>
 </html>
