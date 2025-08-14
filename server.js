@@ -400,7 +400,6 @@ app.get("/tmdb/search", async (req, res) => {
   const url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(searchQuery)}&include_adult=false&language=en-US&page=${page}`;
 
   const options = {
-    method: "GET",
     headers: {
       accept: "application/json",
       Authorization: `Bearer ${process.env.TMDB}`,
@@ -428,13 +427,10 @@ app.get("/tmdb/search", async (req, res) => {
               const id = item.id;
 
               return `
-                <a
-                  href="#"
-                  hx-get="/tmdb/details/${mediaType}/${id}"
-                  hx-target="#container"
-                  hx-swap="innerHTML"
-                  style="text-decoration: none; color: inherit;"
-                >
+                  <a
+                    href="/tmdb/details/${mediaType}/${id}"
+                    style="text-decoration: none, color: inherit;"
+                  >
                   <strong>${title}</strong> (${releaseDate})<br>
                   <em>${description}</em>
                   <hr>
@@ -442,7 +438,7 @@ app.get("/tmdb/search", async (req, res) => {
               `;
             })
             .join("")
-        : "<div>No results found.</div>";
+        : "";
 
     const html = `
       <div id="results">
